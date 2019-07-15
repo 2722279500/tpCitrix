@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+    {include file="public/top"}
+    <style type="text/css">
+        .citrixSort
+        {
+            width: 60px;
+            padding-left: 10px;
+            border-radius: 5px;
+            border:1px solid #CDCDCD;
+            margin-top: 0.15rem;
+        }
+        .table td, .table th {
+            padding: 0.01rem 0.15rem 0.01rem 0.15rem;
+            vertical-align: top;
+            border-top: 1px solid #dee2e6;
+        }
+        .table thead th {
+            vertical-align: bottom;
+            border-bottom: 1px solid rgb(222, 226, 230);
+        }
+        .layui-layer-btn .layui-layer-btn0 {
+            border-color: #1E9FFF;
+            background-color: #1E9FFF;
+            color: #fff!important;
+        }
+        .citrixTh
+        {
+            padding: 5px 0px!important;
+        }
+        .citrixCheckbox
+        {
+            width: 25px;
+            height: 25px;
+            margin-top: 0.35rem;
+            vertical-align: sub;
+        }
+        .citrixBatchCheckbox
+        {
+            width: 25px;
+            height: 25px;
+            margin-top: 0.35rem;
+            vertical-align: bottom;
+        }
+    </style>
+</head>
+<body class="sidebar-fixed header-fixed">
+<div class="page-wrapper">
+    <div class="main-container">
+        <div class="col-md-12 col-md-12">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item">
+                    <a href="{:url('admin/attachment/index')}" class="nav-link active">附件管理</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <form action="{:url('admin/attachment/index')}" method="get">
+                <div class="row" style="margin: 1rem 0rem;">
+                        <div class="col-md-3">
+                            <label for="input-group-2">用途</label>
+                            <div class="input-group">
+                                <input type="text" id="input-group-2" name="use" class="form-control" placeholder="请输入用途" autocomplete="off" {notempty name="$use"} value="{$use}"{/notempty}>
+                                <span class="input-group-btn">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fa fa-search"></i> 搜索
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                </div>
+                </form>
+                <div class="card-body ">
+                    <div class="table-responsive ">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th class="citrixTh">
+                                    &emsp;
+                                </th>
+                                <th class="citrixTh">编号</th>
+                                <th class="citrixTh">预览</th>  
+                                <th class="citrixTh">模块</th>  
+                                <th class="citrixTh">用途</th>    
+                                <th class="citrixTh">大小</th>  
+                                <th class="citrixTh">格式</th>  
+                                <th class="citrixTh">上传IP</th>    
+                                <th class="citrixTh">创建时间</th>    
+                                <th class="citrixTh">状态</th>  
+                                <th class="citrixTh">操作</th>     
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {volist name="$dataList" id="vo"}
+                            <tr>
+                                <td>
+                                    <input type="checkbox" class="citrixCheckbox" name="layNameCheckbox" value="{$vo.id}">
+                                </td>
+                                <td>{$vo.id}</td>
+                                <td class="text-nowrap">
+                                    <a href="{$vo.id|citrixGetUrl}" target="_blank">
+                                        <img src="{$vo.id|citrixGetUrl}" width="20" height="20">
+                                    </a>
+                                </td>
+                                <td>{$vo.module}</td>
+                                <td>{$vo.use}</td>
+                                <td>{$vo.filesize/1024|round=###,2}KB</td>
+                                <td>{$vo.fileext}</td>
+                                <td>{$vo.uploadip}</td>
+                                <td>{$vo.create_time|date="Y-m-d H:i:s",###}</td>
+                                <td>
+                                    <div class="toggle-switch" data-ts-color="danger" style="    line-height: 39px;">
+                                        <input id="ts_status{$vo.id}" name="log_status" type="checkbox" hidden="hidden" {if condition="$vo.status eq 1"} checked=""{/if} value="1" class="log_status" data-id="{$vo.id}">
+                                        <label for="ts_status{$vo.id}" class="ts-helper"></label>
+                                    </div>
+                                </td>
+                                <td>
+                                    <button class="btn btn-danger btn-sm infoDelete" data-id="{$vo.id}">
+                                        删除
+                                    </button>
+                                </td>
+                            </tr>
+                            {/volist}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="row" style="padding-bottom: 1rem;margin: 0rem;">
+                        &nbsp;
+                        <input type="checkbox" class="citrixBatchCheckbox" name="layTableCheckbox" id="layTableCheckbox">&emsp;&emsp;
+                        <button type="button" class="btn btn-primary batchDelete">
+                            批量删除
+                        </button>
+                    </div>
+                    <div style="padding:0 20px;">{$dataList->render()}</div> 
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{include file="public/footer"}
+<script type="text/javascript">
+layui.use(['form'], function()
+{
+    var form     = layui.form;
+    //审核
+    $(document).on("click",".log_status",function()
+    {
+        var id = $(this).attr("data-id");
+        var value = $(this).is(':checked');
+        if(value){
+            value = 1;/*已选中*/
+        }else{
+            value = 0;/*未选中*/
+        }
+        $.ajax({
+            url:"{:url('admin/attachment/changeTableVal')}",
+            data:{'table':'attachment','id_name':'id','id_value':id,'field':'status','value':value},
+            type:'post',
+            async: false,
+            dataType : 'json',
+            success:function(res) 
+            {
+                if(res.code == 1)
+                {
+                    layer.alert(res.msg,{icon:1});
+                    setTimeout(function(){
+                        location.href = location.href;
+                    },1500)
+                }else
+                {
+                    layer.alert(res.msg,{icon:2});
+                }
+            },
+            error:function()
+            {
+                layer.alert("Systematic anomaly！",{icon:2});
+            }
+        });
+    });
+    //删除
+    $(document).on("click",".infoDelete",function()
+    {
+        var id = $(this).attr("data-id");
+        layer.confirm('您确定要删除吗？', 
+        {
+          btn: ['确定','取消']
+        }, function(){
+            $.ajax({
+                url:"{:url('admin/attachment/infoDelete')}",
+                data:{"id":id},
+                type:'post',
+                async: false,
+                dataType : 'json',
+                success:function(res) 
+                {
+                    if(res.code == 1)
+                    {
+                        layer.alert(res.msg,{icon:1});
+                        setTimeout(function(){
+                            location.href = location.href;
+                        },1500)
+                    }else
+                    {
+                        layer.alert(res.msg,{icon:2});
+                    }
+                },
+                error:function()
+                {
+                    layer.alert("Systematic anomaly！",{icon:2});
+                }
+            });
+        });
+    });
+    //全选
+    $(document).on("click","#layTableCheckbox",function()
+    {
+        var value = $("#layTableCheckbox").is(':checked');
+        if(value){
+            value = 1;/*已选中*/
+        }else{
+            value = 0;/*未选中*/
+        }
+        $("input:checkbox[name=layNameCheckbox]").each(function(i)
+        {
+            if(value == 1)
+            {
+                $(this).prop("checked", true);
+            }else
+            {
+                $(this).prop("checked", false);
+            }
+        });
+    });
+    //批量删除
+    $(document).on("click",".batchDelete",function()
+    {
+        var delArray = '' ;
+        $("input:checkbox[name=layNameCheckbox]:checked").each(function(i){
+            if(0==i){
+                delArray = $(this).val();
+            }else{
+                delArray += (","+$(this).val());
+            }
+        });
+        layer.confirm('您确定要批量删除吗？', 
+        {
+          btn: ['确定','取消']
+        }, function(){
+            $.ajax({
+                url:"{:url('admin/attachment/batchDelete')}",
+                data:{"delArray":delArray},
+                type:'post',
+                async: false,
+                dataType : 'json',
+                success:function(res) 
+                {
+                    if(res.code == 1)
+                    {
+                        layer.alert(res.msg,{icon:1});
+                        setTimeout(function(){
+                            location.href = location.href;
+                        },1500)
+                    }else
+                    {
+                        layer.alert(res.msg,{icon:2});
+                    }
+                },
+                error:function()
+                {
+                    layer.alert("Systematic anomaly！",{icon:2});
+                }
+            });
+        });
+    });
+});
+/**
+ * [publish 新增/编辑]
+ * @param  {[type]} e [description]
+ * @return {[type]}   [description]
+ */
+function publish(e)
+{
+    layer.open({
+        type: 2,
+        title: '菜单新增/编辑',
+        shadeClose: true,
+        shade: 0.8,
+        area: ['90%', '90%'],
+        content: $(e).attr("data-url"),
+        end:function()
+        { 
+            location.href = location.href;
+        }
+    });
+}
+</script>
+</body>
+</html>

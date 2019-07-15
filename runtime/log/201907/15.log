@@ -1,0 +1,31 @@
+[ 2019-07-15T11:49:08+08:00 ] 127.0.0.1 127.0.0.1 GET /
+[ log ] www.boots.cc/ [运行时间：0.029000s][吞吐率：34.48req/s] [内存消耗：1,272.79kb] [文件加载：33]
+[ info ] [ ROUTE ] array (
+  'type' => 'module',
+  'module' => 
+  array (
+    0 => '',
+    1 => NULL,
+    2 => NULL,
+  ),
+)
+[ info ] [ HEADER ] array (
+  'host' => 'www.boots.cc',
+  'connection' => 'keep-alive',
+  'cache-control' => 'max-age=0',
+  'upgrade-insecure-requests' => '1',
+  'user-agent' => 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36',
+  'accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+  'accept-encoding' => 'gzip, deflate',
+  'accept-language' => 'zh-CN,zh;q=0.9',
+  'cookie' => 'pgv_pvi=6338732032; pgv_si=s9356828672',
+)
+[ info ] [ PARAM ] array (
+)
+[ info ] [ RUN ] Method [ <user> public method index ] {
+  @@ D:\phpStudy\PHPTutorial\WWW\boots\application\index\controller\Index.php 6 - 10
+}
+
+[ info ] [ LOG ] INIT File
+
+---------------------------------------------------------------

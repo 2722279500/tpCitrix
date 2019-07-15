@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+    {include file="public/top_default"}
+    <style type="text/css">
+        .layui-layer-btn .layui-layer-btn0 
+        {
+            border-color: #1E9FFF;
+            background-color: #1E9FFF;
+            color: #fff!important;
+        }
+        .citrixTypeStyle
+        {
+            opacity: 1;
+            width: 25px;
+            height: 25px;
+            vertical-align: bottom;
+        }
+    </style>
+</head>
+<body class="sidebar-fixed header-fixed">
+<div class="page-wrapper">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="card" style="margin-top: 1rem;">
+                    <div class="card-body p-0" style="margin-top: 1rem;">
+                        <form id="form_array">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="single-select">上级分类</label>
+                                <select id="single-select" name="pid" class="form-control">
+                                    <option value="0">作为主导航</option>
+                                    {volist name="$dataList" id="vo"}
+                                    <option value="{$vo.id}" {notempty name="$getInfo.pid"}{eq name="$getInfo.pid" value="$vo.id"} selected=""{/eq}{else /}{notempty name="$pid"}{eq name="$pid" value="$vo.id"} selected=""{/eq}{/notempty}{/notempty} {if condition="$vo.level eq 3"} disabled="" style="color: #cdcdcd;" {/if}>{$vo.str}{$vo.name}</option>
+                                    {/volist}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="normal-input" class="form-control-label">名称</label>
+                                <input id="normal-input" name="name" autocomplete="off" class="form-control" placeholder="请输入" {notempty name="$getInfo.name"} value="{$getInfo.name}"{/notempty}>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="normal-input" class="form-control-label">链接</label>
+                                <input id="normal-input" name="link" autocomplete="off" class="form-control" placeholder="请输入" {notempty name="$getInfo.link"} value="{$getInfo.link}"{else} value="##"{/notempty}>
+                            </div>
+                        </div>
+                        <div class="col-md-10" style="margin-bottom: 1rem;">
+                            <div class="toggle-switch" data-ts-color="danger">
+                                <label for="ts7" class="ts-label">新窗口打开</label>
+                                <input id="ts7"  name="target" type="checkbox" hidden="hidden" {notempty name="$getInfo.target"} checked="" {/notempty} value="1">
+                                <label for="ts7" class="ts-helper"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-10">
+                            <div class="form-group">
+                                <label for="normal-input" class="form-control-label">导航位置</label>
+                                <div class="form-group">
+                                    <div class="col-md-2" style="float: left;">
+                                    顶部：<input type="radio" name="type" class="citrixTypeStyle" value="1" {notempty name="$getInfo.type"} {if condition="$getInfo.type eq 1"} checked=""{/if}{else} checked=""{/notempty}/>
+                                    </div>
+                                    <div class="col-md-2" style="float: left;">
+                                    中部：<input type="radio" name="type" class="citrixTypeStyle" value="2" {notempty name="$getInfo.type"} {if condition="$getInfo.type eq 2"} checked=""{/if}{/notempty}/>
+                                    </div>
+                                    <div class="col-md-2" style="float: left;">
+                                    底部：<input type="radio" name="type" class="citrixTypeStyle" value="3" {notempty name="$getInfo.type"} {if condition="$getInfo.type eq 3"} checked=""{/if}{/notempty}/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div style="height: 15px;"></div>
+                        </div>
+                        {notempty name="$getInfo"}
+                        <input type="hidden" name="id" value="{$getInfo.id}">
+                        {/notempty}
+                        <div class="col-md-12" style="margin-top: 1rem;">
+                            <div class="form-group">
+                                <button type="button" class="btn btn-primary" id="form_submit">
+                                    <i class="icon icon-event"></i> 
+                                    提交保存
+                                </button>
+                            </div>
+                        </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{include file="public/footer"}
+<script type="text/javascript">
+layui.use(['form'], function()
+{
+    var form     = layui.form;
+    var layerIframe = parent.layer.getFrameIndex(window.name);
+    //表单提交
+    $(document).on("click","#form_submit",function()
+    {
+        $.ajax({
+            url:"{:url('admin/navigationBar/publish')}",
+            data:$('#form_array').serialize(),
+            type:'post',
+            async: false,
+            dataType : 'json',
+            success:function(res) 
+            {
+                if(res.code == 1)
+                {
+                    layer.alert(res.msg);
+                    setTimeout(function(){
+                        parent.layer.close(layerIframe);
+                    },1500)
+                }else
+                {
+                    layer.alert(res.msg,{icon:2});
+                }
+            },
+            error:function()
+            {
+                layer.alert("Systematic anomaly！",{icon:2});
+            }
+        });
+    });
+});
+</script>
+</body>
+</html>

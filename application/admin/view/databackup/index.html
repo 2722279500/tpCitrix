@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+    {include file="public/top"}
+    <style type="text/css">
+        .citrixSort
+        {
+            width: 60px;
+            padding-left: 10px;
+            border-radius: 5px;
+            border:1px solid #CDCDCD;
+            margin-top: 0.15rem;
+        }
+        .table td, .table th {
+            padding: 0.01rem 0.15rem 0.01rem 0.15rem;
+            vertical-align: top;
+            border-top: 1px solid #dee2e6;
+        }
+        .table thead th {
+            vertical-align: bottom;
+            border-bottom: 1px solid rgb(222, 226, 230);
+        }
+        .layui-layer-btn .layui-layer-btn0 {
+            border-color: #1E9FFF;
+            background-color: #1E9FFF;
+            color: #fff!important;
+        }
+        .citrixTh
+        {
+            padding: 5px 0px!important;
+        }
+        .citrixCheckbox
+        {
+            width: 25px;
+            height: 25px;
+            margin-top: 0.35rem;
+            vertical-align: sub;
+        }
+        .citrixCheckbox2
+        {
+            width: 25px;
+            height: 25px;
+            margin-top: 0.35rem;
+            vertical-align: bottom;
+        }
+    </style>
+</head>
+<body class="sidebar-fixed header-fixed">
+<div class="page-wrapper">
+    <div class="main-container">
+        <div class="col-md-12 col-md-12">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item">
+                    <a href="{:url('admin/databackup/index')}" class="nav-link active">数据备份</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{:url('admin/databackup/originalBackupsList')}" class="nav-link">还原备份</a>
+                </li>
+            </ul>
+            <div class="card-header">
+                <a href="javascript:;" class="btn btn-danger executeBackups">
+                    <i class="icon-plus"></i>&nbsp;备份
+                </a>
+            </div>
+            <div class="tab-content">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th class="citrixTh">表名</th> 
+                                <th class="citrixTh">注释</th> 
+                                <th class="citrixTh">数据量</th> 
+                                <th class="citrixTh">引擎</th> 
+                                <th class="citrixTh">数据容量</th> 
+                                <th class="citrixTh">索引容量</th> 
+                                <th class="citrixTh">创建时间</th> 
+                            </tr>
+                            </thead>
+                            <tbody id="tb">
+                            {volist name="$dataList" id="vo"}
+                            <tr>
+                                <td>{$vo.surfaceInfo.TABLE_NAME}</td>
+                                <td>{$vo.surfaceInfo.TABLE_COMMENT}</td>
+                                <td>{$vo.surfaceInfo.TABLE_COUNT}</td>
+                                <td>{$vo.surfaceInfo.ENGINE}</td>
+                                <td>{$vo.surfaceInfo.DATA_LENGTH/1024/1024|number_format=###,2}MB</td>
+                                <td>{$vo.surfaceInfo.INDEX_LENGTH/1024/1024|number_format=###,2}MB</td>
+                                <td>{$vo.surfaceInfo.CREATE_TIME}</td>
+                            </tr>
+                            {/volist}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{include file="public/footer"}
+<script type="text/javascript">
+layui.use(['form'], function()
+{
+    var form = layui.form;
+    //删除
+    $(document).on("click",".executeBackups",function()
+    {
+        layer.msg('正在执行中请稍候...', {icon: 16,time: 100000,shade : [0.5 , '#000' , true]});
+        $.ajax({
+            url:"{:url('admin/databackup/executeBackups')}",
+            type:'post',
+            async: false,
+            dataType : 'json',
+            success:function(res) 
+            {
+                layer.closeAll(); 
+                if(res.code == 1)
+                {
+                    layer.alert(res.msg,{icon:1});
+                    setTimeout(function(){
+                        location.href = location.href;
+                    },1500)
+                }else
+                {
+                    layer.alert(res.msg,{icon:2});
+                }
+            },
+            error:function()
+            {
+                layer.alert("Systematic anomaly！",{icon:2});
+            }
+        });
+    });
+});
+</script>
+</body>
+</html>

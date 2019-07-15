@@ -1,0 +1,42 @@
+    <nav class="navbar page-header">
+        <a href="javascript:;" class="btn btn-link sidebar-mobile-toggle d-md-none mr-auto">
+            <i class="fa fa-bars"></i>
+        </a>
+        <a class="navbar-brand" href="javascript:;">
+            <img src="__IMG__/logo.png" alt="logo">
+        </a>
+        <a href="javascript:;" class="btn btn-link sidebar-toggle d-md-down-none">
+            <i class="fa fa-bars"></i>
+        </a>
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item d-md-down-none">
+                <a href="javascript:;">
+                    <i class="fa fa-bell"></i>
+                    <span class="badge badge-pill badge-danger">5</span>
+                </a>
+            </li>
+            <li class="nav-item d-md-down-none">
+                <a href="javascript:;">
+                    <i class="fa fa-envelope-open"></i>
+                    <span class="badge badge-pill badge-danger">5</span>
+                </a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="javascript:;" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <img {notempty name="$getAdminInfo.name"} src="{$getAdminInfo.thumb|citrixGetUrl}"{else} src="__IMG__/avatar-1.png"{/notempty} class="avatar avatar-sm" alt="logo" height="36">
+                    <span class="small ml-1 d-md-down-none">{$getAdminInfo.name}</span>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right">
+                    <a href="{:url('index/index/index')}" class="dropdown-item" target="_blank">
+                        <i class="icon-screen-desktop"></i> 打开站点
+                    </a>
+                    <a href="{:url('admin/common/clearDelete')}" class="dropdown-item">
+                        <i class="icon-ghost"></i> 清空缓存
+                    </a>
+                    <a href="{:url('admin/common/logout')}" class="dropdown-item">
+                        <i class="fa fa-lock"></i> 安全退出
+                    </a>
+                </div>
+            </li>
+        </ul>
+    </nav>

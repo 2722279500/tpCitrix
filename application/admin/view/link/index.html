@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+<head>
+    {include file="public/top"}
+    <style type="text/css">
+         .citrixSort
+        {
+            width: 60px;
+            padding-left: 10px;
+            border-radius: 5px;
+            border:1px solid #CDCDCD;
+            margin-top: 0.15rem;
+        }
+        .table td, .table th {
+            padding: 0.01rem 0.15rem 0.01rem 0.15rem;
+            vertical-align: top;
+            border-top: 1px solid #dee2e6;
+        }
+        .table thead th {
+            vertical-align: bottom;
+            border-bottom: 1px solid rgb(222, 226, 230);
+        }
+        .layui-layer-btn .layui-layer-btn0 {
+            border-color: #1E9FFF;
+            background-color: #1E9FFF;
+            color: #fff!important;
+        }
+        .citrixTh
+        {
+            padding: 5px 0px!important;
+        }
+        .citrixCheckbox
+        {
+            width: 25px;
+            height: 25px;
+            margin-top: 0.35rem;
+            vertical-align: sub;
+        }
+        .citrixCheckbox2
+        {
+            width: 25px;
+            height: 25px;
+            margin-top: 0.35rem;
+            vertical-align: bottom;
+        }
+    </style>
+</head>
+<body class="sidebar-fixed header-fixed">
+<div class="page-wrapper">
+    <div class="main-container">
+        <div class="col-md-12 col-md-12">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item">
+                    <a href="{:url('admin/link/index')}" class="nav-link active">友情链接</a>
+                </li>
+            </ul>
+            <div class="card-header">
+                <a href="javascript:;" class="btn btn-primary"  onclick="publish(this)" data-url="{:url('admin/link/publish')}">
+                    <i class="icon-plus"></i>&nbsp;新增
+                </a>
+            </div>
+            <div class="tab-content">
+                <div class="card-body">
+                    {notempty name="$dataList"}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th class="citrixTh">
+                                    &emsp;
+                                </th>
+                                <th class="citrixTh">编号</th>
+                                <th class="citrixTh">排序</th>
+                                <th class="citrixTh">缩略图</th>
+                                <th class="citrixTh">链接名称</th>
+                                <th class="citrixTh">链接地址</th>
+                                <th class="citrixTh">创建时间</th>
+                                <th class="citrixTh">编辑时间</th>
+                                <th class="citrixTh">操作</th>   
+                            </tr>
+                            </thead>
+                            <tbody id="tb">
+                            {volist name="$dataList" id="vo"}
+                            <tr>
+                                <td>
+                                    <input type="checkbox" class="citrixCheckbox" name="layNameCheckbox" value="{$vo.id}">
+                                </td>
+                                <td>{$vo.id}</td>
+                                <td>
+                                    <input type="text" value="{$vo.sort}" class="citrixSort" onblur="change_table_val('sys_link','id','{$vo.id}','sort',this)">
+                                </td>
+                                <td class="text-nowrap">
+                                    <a href="{$vo.thumb|citrixGetUrl}" target="_blank">
+                                        <img src="{$vo.thumb|citrixGetUrl}" width="20" height="20">
+                                    </a>
+                                </td>
+                                <td>{$vo.name|htmlspecialchars}</td>
+                                <td>
+                                    <a href="{$vo.path_url}" target="_blank" style="width: 100px;overflow: hidden; text-overflow:ellipsis; white-space: nowrap;">
+                                        点击查看
+                                    </a>
+                                </td>
+                                <td>{$vo.create_time|date="Y-m-d H:i:s",###}</td>
+                                <td>{notempty name="$vo.update_time"}{$vo.update_time|date="Y-m-d H:i:s",###}{/notempty}</td>
+                                <td>
+                                    <button class="btn btn-success btn-sm" onclick="publish(this)" data-url="{:url('admin/link/publish',['id'=>$vo.id])}">编辑</button>
+                                    <button class="btn btn-danger btn-sm infoDelete" data-id="{$vo.id}">删除</button>
+                                </td>
+                            </tr>
+                            {/volist}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="row" style="padding-bottom: 1rem;margin: 0rem;">
+                        &nbsp;
+                        <input type="checkbox" class="citrixCheckbox2" name="layTableCheckbox" id="layTableCheckbox">&emsp;&emsp;
+                        <button type="button" class="btn btn-primary batchDelete">
+                            批量删除
+                        </button>
+                    </div>
+                    <div style="padding:0 20px;">{$dataList->render()}</div> 
+                    {/notempty}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{include file="public/footer"}
+<script type="text/javascript">
+layui.use(['form'], function()
+{
+    var form     = layui.form;
+    //删除
+    $(document).on("click",".infoDelete",function()
+    {
+        var id = $(this).attr("data-id");
+        layer.confirm('您确定要删除吗？', 
+        {
+          btn: ['确定','取消']
+        }, function(){
+            $.ajax({
+                url:"{:url('admin/link/infoDelete')}",
+                data:{"id":id},
+                type:'post',
+                async: false,
+                dataType : 'json',
+                success:function(res) 
+                {
+                    if(res.code == 1)
+                    {
+                        layer.alert(res.msg,{icon:1});
+                        setTimeout(function(){
+                            location.href = location.href;
+                        },1500)
+                    }else
+                    {
+                        layer.alert(res.msg,{icon:2});
+                    }
+                },
+                error:function()
+                {
+                    layer.alert("Systematic anomaly！",{icon:2});
+                }
+            });
+        });
+    });
+    //审核
+    $(document).on("click",".log_status",function()
+    {
+        var id = $(this).attr("data-id");
+        var value = $(this).is(':checked');
+        if(value){
+            value = 1;/*已选中*/
+        }else{
+            value = 0;/*未选中*/
+        }
+        $.ajax({
+            url:"{:url('admin/link/changeTableVal')}",
+            data:{'table':'sys_link','id_name':'id','id_value':id,'field':'status','value':value},
+            type:'post',
+            async: false,
+            dataType : 'json',
+            success:function(res) 
+            {
+                if(res.code == 1)
+                {
+                    layer.alert(res.msg,{icon:1});
+                    setTimeout(function(){
+                        location.href = location.href;
+                    },1500)
+                }else
+                {
+                    layer.alert(res.msg,{icon:2});
+                }
+            },
+            error:function()
+            {
+                layer.alert("Systematic anomaly！",{icon:2});
+            }
+        });
+    });
+    //置顶
+    $(document).on("click",".is_top",function()
+    {
+        var id = $(this).attr("data-id");
+        var value = $(this).is(':checked');
+        if(value){
+            value = 1;/*已选中*/
+        }else{
+            value = 0;/*未选中*/
+        }
+        $.ajax({
+            url:"{:url('admin/link/changeTableVal')}",
+            data:{'table':'sys_link','id_name':'id','id_value':id,'field':'is_top','value':value},
+            type:'post',
+            async: false,
+            dataType : 'json',
+            success:function(res) 
+            {
+                if(res.code == 1)
+                {
+                    layer.alert(res.msg,{icon:1});
+                    setTimeout(function(){
+                        location.href = location.href;
+                    },1500)
+                }else
+                {
+                    layer.alert(res.msg,{icon:2});
+                }
+            },
+            error:function()
+            {
+                layer.alert("Systematic anomaly！",{icon:2});
+            }
+        });
+    });
+    //全选
+    $(document).on("click","#layTableCheckbox",function()
+    {
+        var value = $("#layTableCheckbox").is(':checked');
+        if(value){
+            value = 1;/*已选中*/
+        }else{
+            value = 0;/*未选中*/
+        }
+        $("input:checkbox[name=layNameCheckbox]").each(function(i)
+        {
+            if(value == 1)
+            {
+                $(this).prop("checked", true);
+            }else
+            {
+                $(this).prop("checked", false);
+            }
+        });
+    });
+    //批量删除
+    $(document).on("click",".batchDelete",function()
+    {
+        var delArray = '' ;
+        $("input:checkbox[name=layNameCheckbox]:checked").each(function(i){
+            if(0==i){
+                delArray = $(this).val();
+            }else{
+                delArray += (","+$(this).val());
+            }
+        });
+        layer.confirm('您确定要批量删除吗？', 
+        {
+          btn: ['确定','取消']
+        }, function(){
+            $.ajax({
+                url:"{:url('admin/link/batchDelete')}",
+                data:{"delArray":delArray},
+                type:'post',
+                async: false,
+                dataType : 'json',
+                success:function(res) 
+                {
+                    if(res.code == 1)
+                    {
+                        layer.alert(res.msg,{icon:1});
+                        setTimeout(function(){
+                            location.href = location.href;
+                        },1500)
+                    }else
+                    {
+                        layer.alert(res.msg,{icon:2});
+                    }
+                },
+                error:function()
+                {
+                    layer.alert("Systematic anomaly！",{icon:2});
+                }
+            });
+        });
+    });
+});
+/**
+ * [publish 新增/编辑]
+ * @param  {[type]} e [description]
+ * @return {[type]}   [description]
+ */
+function publish(e)
+{
+    layer.open({
+        type: 2,
+        title: '新增/编辑',
+        shadeClose: true,
+        shade: 0.8,
+        area: ['90%', '90%'],
+        content: $(e).attr("data-url"),
+        end:function()
+        { 
+            location.href = location.href;
+        }
+    });
+}
+/**
+ * [change_table_val description]
+ * @param  {[type]} table    [description]
+ * @param  {[type]} id_name  [description]
+ * @param  {[type]} id_value [description]
+ * @param  {[type]} field    [description]
+ * @param  {[type]} obj      [description]
+ * @return {[type]}          [description]
+ */
+function change_table_val(table,id_name,id_value,field,obj)
+{ 
+    var value = $(obj).val();
+    $.ajax({
+        url:"{:url('admin/link/changeTableVal')}",
+        data:{'table':table,'id_name':id_name,'id_value':id_value,'field':field,'value':value},
+        type:'post',
+        async: false,
+        dataType : 'json',
+        success:function(res) 
+        {
+            layer.msg(res.msg);
+        },
+        error:function()
+        {
+            layer.alert("Systematic anomaly！",{icon:2});
+        }
+    });
+}
+</script>
+</body>
+</html>

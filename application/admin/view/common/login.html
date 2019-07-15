@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+    {include file="public/top"}
+    <style type="text/css">
+        .layui-layer-btn .layui-layer-btn0 
+        {
+            border-color: #1E9FFF;
+            background-color: #1E9FFF;
+            color: #fff!important;
+        }
+    </style>
+</head>
+<body>
+<div class="page-wrapper flex-row align-items-center">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-5">
+                <div class="card p-4">
+                    <form id="form_array">
+                    <div class="card-header text-center text-uppercase h4 font-weight-light">
+                        登录
+                    </div>
+                    <div class="card-body py-5">
+                        <div class="form-group">
+                            <label class="form-control-label">账号</label>
+                            <input type="text" name="name" autocomplete="off" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-control-label">密码</label>
+                            <input type="password" name="password" autocomplete="off" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <h5 class="form-control-label" style="font-size: .875rem;">验证码</h5>
+                            <dt style="width: 230px;float: left;">
+                                <input type="text" name="verifyCode" id="verifyCode" autocomplete="off"  placeholder="请输入验证码" class="form-control">
+                            </dt>
+                            <dd>
+                                <img src="{:captcha_src()}" alt="captcha" onclick="this.src='{:captcha_src()}?seed='+Math.random()" width="94" height="46" id="captcha" />
+                            </dd>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="col-6">
+                                <button type="button" class="btn btn-primary px-5" id="form_submit">登入</button>
+                            </div>
+                            <div class="col-6">
+                                <a href="{:url('admin/common/register')}" class="btn btn-link">
+                                <i class="icon-key"></i>
+                                忘记密码
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{include file="public/footer"}
+<script type="text/javascript">
+layui.use(['form'], function()
+{
+    //layui句柄
+    var form     = layui.form;
+    //表单提交
+    $(document).on("click","#form_submit",function()
+    {
+        $.ajax({
+            url:"{:url('admin/common/loginPublish')}",
+            data:$('#form_array').serialize(),
+            type:'post',
+            async: false,
+            dataType : 'json',
+            success:function(res) 
+            {
+                if(res.code == 1)
+                {
+                    layer.msg(res.msg);
+                    setTimeout(function(){
+                        location.href = res.url;
+                    },1500)
+                }else
+                {
+                    layer.msg(res.msg);
+                    var ts = Date.parse(new Date())/1000;
+                    var img = document.getElementById('captcha');
+                    img.src = "/captcha?id="+ts;
+                }
+            },
+            error:function()
+            {
+                layer.alert("Systematic anomaly！",{icon:2});
+            }
+        });
+    });
+});
+</script>
+</body>
+</html>

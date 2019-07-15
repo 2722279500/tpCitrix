@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+    {include file="public/top_default"}
+    <style type="text/css">
+        .layui-layer-btn .layui-layer-btn0 
+        {
+            border-color: #1E9FFF;
+            background-color: #1E9FFF;
+            color: #fff!important;
+        }
+        .layui-upload-file
+        {
+            display: none;
+        }
+    </style>
+</head>
+<body class="sidebar-fixed header-fixed">
+<div class="page-wrapper">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="card" style="margin-top: 1rem;">
+                    <div class="card-body p-0" style="margin-top: 1rem;">
+                        <form id="form_array">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="normal-input" class="form-control-label">链接名称</label>
+                                <input id="normal-input" name="name" autocomplete="off" class="form-control" placeholder="请输入" {notempty name="$getInfo.name"} value="{$getInfo.name}"{/notempty}>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="normal-input" class="form-control-label">链接地址</label>
+                                <input id="normal-input" name="path_url" autocomplete="off"" class="form-control" placeholder="请输入" {notempty name="$getInfo.path_url"} value="{$getInfo.path_url}"{/notempty}>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card p-4">
+                                <div  id="upload-thumb">
+                                    <label>缩略图</label>
+                                    <button type="button"  id="thumb_click">上传图片</button>
+                                    <div >
+                                      <label ></label>
+                                      <img  id="thumb" width="150" height="150" {notempty name="$getInfo.thumb"} src="{$getInfo.thumb|citrixGetUrl}"{/notempty}>{notempty name="$getInfo.thumb"}<input type="hidden" name="thumb" value="{$getInfo.thumb}">{/notempty}
+                                    </div>
+                                  </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div style="height: 15px;"></div>
+                        </div>
+                        {notempty name="$getInfo"}
+                        <input type="hidden" name="id" value="{$getInfo.id}">
+                        {/notempty}
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <button type="button" class="btn btn-primary" id="form_submit">
+                                    <i class="icon icon-event"></i> 
+                                    提交保存
+                                </button>
+                            </div>
+                        </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{include file="public/footer"}
+<script type="text/javascript">
+layui.use(['form','upload'], function()
+{
+    //layui句柄
+    var form     = layui.form
+        ,upload  = layui.upload;
+    //iframe句柄
+    var layerIframe = parent.layer.getFrameIndex(window.name);
+    //角色头像上传
+    upload.render({
+        elem: '#thumb_click' //绑定元素
+        ,url: "{:url('admin/common/upload')}" //上传接口
+        ,data:{use:'link_default'}
+        ,dataType : 'json'
+        ,done: function(res){
+            //上传完毕回调
+            if(res.code == 1) 
+            {
+                $('#thumb').attr('src',res.src);
+                $('#upload-thumb').append('<input type="hidden" name="thumb" value="'+ res.id +'">');
+            } else {
+                layer.msg(res.msg);
+            }
+        }
+        ,error: function()
+        {
+            layer.alert("Systematic anomaly！",{icon:2});
+        }
+    });
+    //表单提交
+    $(document).on("click","#form_submit",function()
+    {
+        $.ajax({
+            url:"{:url('admin/link/publish')}",
+            data:$('#form_array').serialize(),
+            type:'post',
+            async: false,
+            dataType : 'json',
+            success:function(res) 
+            {
+                if(res.code == 1)
+                {
+                    layer.alert(res.msg);
+                    setTimeout(function(){
+                        parent.layer.close(layerIframe);
+                    },1500)
+                }else
+                {
+                    layer.alert(res.msg,{icon:2});
+                }
+            },
+            error:function()
+            {
+                layer.alert("Systematic anomaly！",{icon:2});
+            }
+        });
+    });
+});
+</script>
+</body>
+</html>

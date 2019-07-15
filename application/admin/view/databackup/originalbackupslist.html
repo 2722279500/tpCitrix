@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+    {include file="public/top"}
+    <style type="text/css">
+        .citrixSort
+        {
+            width: 60px;
+            padding-left: 10px;
+            border-radius: 5px;
+            border:1px solid #CDCDCD;
+            margin-top: 0.15rem;
+        }
+        .table td, .table th {
+            padding: 0.01rem 0.15rem 0.01rem 0.15rem;
+            vertical-align: top;
+            border-top: 1px solid #dee2e6;
+        }
+        .table thead th {
+            vertical-align: bottom;
+            border-bottom: 1px solid rgb(222, 226, 230);
+        }
+        .layui-layer-btn .layui-layer-btn0 {
+            border-color: #1E9FFF;
+            background-color: #1E9FFF;
+            color: #fff!important;
+        }
+        .citrixTh
+        {
+            padding: 5px 0px!important;
+        }
+        .citrixCheckbox
+        {
+            width: 25px;
+            height: 25px;
+            margin-top: 0.35rem;
+            vertical-align: sub;
+        }
+        .citrixCheckbox2
+        {
+            width: 25px;
+            height: 25px;
+            margin-top: 0.35rem;
+            vertical-align: bottom;
+        }
+    </style>
+</head>
+<body class="sidebar-fixed header-fixed">
+<div class="page-wrapper">
+    <div class="main-container">
+        <div class="col-md-12 col-md-12">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item">
+                    <a href="{:url('admin/databackup/index')}" class="nav-link">数据备份</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{:url('admin/databackup/originalBackupsList')}" class="nav-link active">还原备份</a>
+                </li>
+            </ul>
+            <div class="card-header">
+                <a href="javascript:;" >
+                    &nbsp;
+                </a>
+            </div>
+            <div class="tab-content">
+                <div class="card-body">
+                    {notempty name="$originalBackupsList"}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th class="citrixTh">备份名称</th> 
+                                <th class="citrixTh">压缩格式</th> 
+                                <th class="citrixTh">数据大小</th> 
+                                <th class="citrixTh">备份时间</th> 
+                                <th class="citrixTh">操作</th> 
+                            </tr>
+                            </thead>
+                            <tbody id="tb">
+                            {volist name="$originalBackupsList" id="vo"}
+                            <tr>
+                                <td>
+                                    <a href="/Data/{$vo.name}" download="{$vo.name}">
+                                        {$vo.path_name}
+                                    </a>
+                                </td>
+                                <td>{$vo.suffix}</td>
+                                <td>{$vo.size}</td>
+                                <td>{$vo.time|date="Y-m-d H:i:s",###}</td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm originalBackups" data-id="{$vo.name}">还原</button>
+                                    <button class="btn btn-secondary btn-sm deleteBackups" data-id="{$vo.name}">删除</button>
+                                </td>
+                            </tr>
+                            {/volist}
+                            </tbody>
+                        </table>
+                    </div>
+                    {/notempty}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{include file="public/footer"}
+<script type="text/javascript">
+layui.use(['form'], function()
+{
+    var form = layui.form;
+    //删除
+    $(document).on("click",".deleteBackups",function()
+    {
+        var id = $(this).attr("data-id");
+        layer.confirm('您确定要删除吗？', 
+        {
+          btn: ['确定','取消']
+        }, function(){
+            $.ajax({
+                url:"{:url('admin/databackup/deleteBackups')}",
+                data:{"id":id},
+                type:'post',
+                async: false,
+                dataType : 'json',
+                success:function(res) 
+                {
+                    if(res.code == 1)
+                    {
+                        layer.alert(res.msg,{icon:1});
+                        setTimeout(function(){
+                            location.href = location.href;
+                        },1500)
+                    }else
+                    {
+                        layer.alert(res.msg,{icon:2});
+                    }
+                },
+                error:function()
+                {
+                    layer.alert("Systematic anomaly！",{icon:2});
+                }
+            });
+        });
+    });
+    //还原
+     $(document).on("click",".originalBackups",function()
+    {
+        var id = $(this).attr("data-id");
+        layer.confirm('您确定要执行还原吗？', 
+        {
+          btn: ['确定','取消']
+        }, function(){
+            layer.closeAll(); 
+            layer.msg('正在执行中请稍候...', {icon: 16,time: 100000,shade : [0.5 , '#000' , true]});
+            setTimeout(function()
+            {
+                $.ajax({
+                    url:"{:url('admin/databackup/originalBackups')}",
+                    data:{"id":id},
+                    type:'post',
+                    async: false,
+                    dataType : 'json',
+                    success:function(res) 
+                    {
+                        layer.closeAll(); 
+                        if(res.code == 1)
+                        {
+                            layer.alert(res.msg,{icon:1});
+                        }else
+                        {
+                            layer.alert(res.msg,{icon:2});
+                        }
+                    },
+                    error:function()
+                    {
+                        layer.alert("Systematic anomaly！",{icon:2});
+                    }
+                });
+            },1500)
+        });
+    });
+
+});
+</script>
+</body>
+</html>

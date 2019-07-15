@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+    {include file="public/top"}
+</head>
+<body class="sidebar-fixed header-fixed">
+<div class="page-wrapper">
+    {include file="public/left"}
+    <div class="main-container">
+        <div class="sidebar">
+            <nav class="sidebar-nav">
+                <ul class="nav">
+                    {volist name="$baseLeftList" id="v1"}
+                    <li class="nav-item {notempty name="$v1.list"}nav-dropdown{/notempty}">
+                        {empty name="$v1.url"}
+                        {notempty name="$v1.list"}
+                        <a href="javascript:;" class="nav-link  nav-dropdown-toggle">
+                            <i class="icon icon-social-dropbox"></i> 
+                            {$v1.name}
+                            <i class="fa fa-caret-left"></i>
+                        </a>
+                        {else}
+                        <li class="nav-item">
+                            <a href="javascript:;" {if condition="$v1.id eq 70"} data-url="{:url('admin/index/index')}"{/if} class="nav-link active">
+                                <i class="icon icon-home"></i> {$v1.name} 
+                            </a>
+                        </li>
+                        {/notempty}
+                        {else}
+                        <a href="javascript:;" data-url="{$v1.url}" class="nav-link ">
+                            <i class="icon icon-home"></i> {$v1.name}
+                        </a>
+                        {/empty}
+                        {notempty name="$v1.list"}
+                        <ul class="nav-dropdown-items">
+                            {volist name="$v1.list" id="v2"}
+                            <li class="nav-item">
+                                <a href="javascript:;" {notempty name="$v2.url"} data-url="{$v2.url}"{/notempty} class="nav-link ">
+                                    <i class="icon icon-energy"></i> {$v2.name}
+                                </a>
+                            </li>
+                            {/volist}
+                        </ul>
+                        {/notempty}
+                    </li>
+                    {/volist}
+                </ul>
+            </nav>
+        </div>
+        <div class="content">
+            <iframe src="{:url('admin/index/index')}" width="100%" height="100%" name="ifFrame" frameborder="0" id="ifFrame"></iframe>
+        </div>
+    </div>
+</div>
+{include file="public/footer"}
+<script type="text/javascript">
+
+//iframe窗口
+$(document).ready(function() 
+{
+    $(document).on("click","a",function()
+    {
+        var ifRameUrl = $(this).attr("data-url");
+        if (typeof(ifRameUrl) != "undefined")
+        {
+            if(ifRameUrl.length >= 1)
+            {
+                $("#ifFrame").attr('src',ifRameUrl);
+            }
+        }
+    });
+}); 
+</script>
+</body>
+</html>

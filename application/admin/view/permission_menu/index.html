@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+    {include file="public/top_default"}
+    <style type="text/css">
+        .citrixSort
+        {
+            width: 60px;
+            padding-left: 10px;
+            border-radius: 5px;
+            border:1px solid #CDCDCD;
+            margin-top: 0.15rem;
+        }
+        .table td, .table th {
+            padding: 0.01rem 0.15rem 0.01rem 0.15rem;
+            vertical-align: top;
+            border-top: 1px solid #dee2e6;
+        }
+        .table thead th {
+            vertical-align: bottom;
+            border-bottom: 1px solid rgb(222, 226, 230);
+        }
+        .layui-layer-btn .layui-layer-btn0 {
+            border-color: #1E9FFF;
+            background-color: #1E9FFF;
+            color: #fff!important;
+        }
+        .citrixTh
+        {
+            padding: 5px 0px!important;
+        }
+    </style>
+</head>
+<body class="sidebar-fixed header-fixed">
+<div class="page-wrapper">
+    <div class="main-container">
+        <div class="col-md-12 col-md-12">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item">
+                    <a href="{:url('admin/permissionMenu/index')}" class="nav-link active">系统菜单</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{:url('admin/permissionAdmin/index')}" class="nav-link">管理员</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{:url('admin/permissionLimit/index')}" class="nav-link">权限组</a>
+                </li>
+            </ul>
+            <div class="card-header">
+                <a href="javascript:;" class="btn btn-primary" onclick="publish(this)" data-url="{:url('admin/permissionMenu/publish')}">
+                    <i class="icon-plus"></i>&nbsp;新增菜单
+                </a>
+            </div>
+            <div class="tab-content">
+                <div class="card-body ">
+                    <div class="table-responsive ">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th class="citrixTh">排序</th>
+                                <th class="citrixTh">编号</th>
+                                <th class="citrixTh">名称</th>
+                                <th class="citrixTh">模块</th>
+                                <th class="citrixTh">控制器</th>
+                                <th class="citrixTh">方法</th>
+                                <th class="citrixTh">备注</th>
+                                <th class="citrixTh">状态</th>
+                                <th class="citrixTh">创建时间</th>
+                                <th class="citrixTh">操作</th>     
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {volist name="$dataList" id="vo"}
+                            <tr>
+                                <td >
+                                    <input type="text" value="{$vo.sort}" class="citrixSort" onblur="change_table_val('sys_menu','id','{$vo.id}','sort',this)">
+                                </td>
+                                <td>{$vo.id}</td>
+                                <td class="text-nowrap">{$vo.str}{$vo.name}</td>
+                                <td>{$vo.module}</td>
+                                <td>{$vo.controller}</td>
+                                <td>{$vo.function}</td>
+                                <td class="text-nowrap">{$vo.description}</td>
+                                <td>
+                                    {if condition="$vo.is_display eq 1"}
+                                        <span style="color: #F60;">左侧菜单</span>
+                                    {else}
+                                        <span>节点菜单</span>
+                                    {/if}
+                                </td>
+                                <td>{$vo.create_time|date="Y-m-d H:i:s",###}</td>
+                                <td>
+                                    {if condition="$vo.level eq 3"}
+                                    <button class="btn btn-secondary btn-sm" style="cursor: not-allowed;">
+                                        &thinsp;&thinsp;<i class="icon-plus"></i>&thinsp;&thinsp;
+                                    </button>
+                                    {else}
+                                    <button class="btn btn-primary btn-sm" onclick="publish(this)" data-url="{:url('admin/permissionMenu/publish',['pid'=>$vo.id])}">
+                                        &thinsp;&thinsp;<i class="icon-plus"></i>&thinsp;&thinsp;
+                                    </button>
+                                    {/if}
+                                    <button class="btn btn-success btn-sm" onclick="publish(this)" data-url="{:url('admin/permissionMenu/publish',['id'=>$vo.id])}">
+                                        编辑
+                                    </button>
+                                    <button class="btn btn-danger btn-sm infoDelete" data-id="{$vo.id}">
+                                        删除
+                                    </button>
+                                </td>
+                            </tr>
+                            {/volist}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{include file="public/footer"}
+<script type="text/javascript">
+layui.use(['form'], function()
+{
+    var form     = layui.form;
+    //删除
+    $(document).on("click",".infoDelete",function()
+    {
+        var id = $(this).attr("data-id");
+        layer.confirm('您确定要删除吗？', 
+        {
+          btn: ['确定','取消']
+        }, function(){
+            $.ajax({
+                url:"{:url('admin/permissionMenu/infoDelete')}",
+                data:{"id":id},
+                type:'post',
+                async: false,
+                dataType : 'json',
+                success:function(res) 
+                {
+                    if(res.code == 1)
+                    {
+                        layer.alert(res.msg,{icon:1});
+                        setTimeout(function(){
+                            location.href = location.href;
+                        },1500)
+                    }else
+                    {
+                        layer.alert(res.msg,{icon:2});
+                    }
+                },
+                error:function()
+                {
+                    layer.alert("Systematic anomaly！",{icon:2});
+                }
+            });
+        });
+    });
+});
+/**
+ * [publish 新增/编辑]
+ * @param  {[type]} e [description]
+ * @return {[type]}   [description]
+ */
+function publish(e)
+{
+    layer.open({
+        type: 2,
+        title: '菜单新增/编辑',
+        shadeClose: true,
+        shade: 0.8,
+        area: ['90%', '90%'],
+        content: $(e).attr("data-url"),
+        end:function()
+        { 
+            location.href = location.href;
+        }
+    });
+}
+/**
+ * [change_table_val description]
+ * @param  {[type]} table    [description]
+ * @param  {[type]} id_name  [description]
+ * @param  {[type]} id_value [description]
+ * @param  {[type]} field    [description]
+ * @param  {[type]} obj      [description]
+ * @return {[type]}          [description]
+ */
+function change_table_val(table,id_name,id_value,field,obj)
+{ 
+    var value = $(obj).val();
+    $.ajax({
+        url:"{:url('admin/permissionMenu/changeTableVal')}",
+        data:{'table':table,'id_name':id_name,'id_value':id_value,'field':field,'value':value},
+        type:'post',
+        async: false,
+        dataType : 'json',
+        success:function(res) 
+        {
+            layer.msg(res.msg);
+        },
+        error:function()
+        {
+            layer.alert("Systematic anomaly！",{icon:2});
+        }
+    });
+}
+</script>
+</body>
+</html>

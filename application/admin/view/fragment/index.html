@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+    {include file="public/top_default"}
+    <style type="text/css">
+         .citrixSort
+        {
+            width: 60px;
+            padding-left: 10px;
+            border-radius: 5px;
+            border:1px solid #CDCDCD;
+            margin-top: 0.15rem;
+        }
+        .table td, .table th {
+            padding: 0.01rem 0.15rem 0.01rem 0.15rem;
+            vertical-align: top;
+            border-top: 1px solid #dee2e6;
+        }
+        .table thead th {
+            vertical-align: bottom;
+            border-bottom: 1px solid rgb(222, 226, 230);
+        }
+        .layui-layer-btn .layui-layer-btn0 {
+            border-color: #1E9FFF;
+            background-color: #1E9FFF;
+            color: #fff!important;
+        }
+        .citrixTh
+        {
+            padding: 5px 0px!important;
+        }
+        .citrixTd
+        {
+            width: 50%;
+            float: left;
+            text-align: center;
+        }
+        .citrixDd
+        {
+            width: 50%;
+            float: right
+            ;text-align: center;
+        }
+    </style>
+</head>
+<body class="sidebar-fixed header-fixed">
+<div class="page-wrapper">
+    <div class="main-container">
+        <div class="col-md-12 col-md-12">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item">
+                    <a href="{:url('admin/fragment/index')}" class="nav-link active">内容碎片</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="card-header" >
+                    <a href="javascript:;" class="btn btn-danger"  onclick="publish(this)" data-url="{:url('admin/fragment/publish')}">
+                        <i class="icon-plus"></i>&nbsp;新增
+                    </a>
+                </div>
+                {notempty name="$dataList"}
+                {volist name="$dataList" id="v1" key="k1"}
+                <div class="row" style="margin: 1rem;border-bottom: 2px solid #999;{if condition="$k1 eq 1"}border-top: 1px solid #999;margin-top: 0rem;{elseif condition="$k1 eq count($dataList)"}border-bottom: 0px solid #999;{/if}">
+                    <div class="col-md-3" {if condition="$k1 eq 1"} style="margin-top: 1rem;" {/if}>
+                        <div class="card">
+                            <div class="card-body" style="padding: 0rem;">
+                                <a href="{$v1.thumb|citrixGetUrl}" target="_blank">
+                                    <img src="{$v1.thumb|citrixGetUrl}" class="col-md-12" style="padding: 0rem;">
+                                </a>
+                            </div>
+                            <div class="card-footer bg-light">
+                                <h5 style="font-size: 0.8rem;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;">{$v1.fragment_name}</h5>
+                                <dl>
+                                    <dd class="btn btn-success btn-sm citrixTd" onclick="publish(this)" data-url="{:url('admin/fragment/publish',['id'=>$v1.id])}">编辑</dd>
+                                    <dt class="btn btn-danger btn-sm infoDelete citrixDd" data-id="{$v1.id}">删除</dt>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                    {notempty name="$v1.all"}
+                    {volist name="$v1.all" id="v2"}
+                    <div class="col-md-3" {if condition="$k1 eq 1"} style="margin-top: 1rem;" {/if}>
+                        <div class="card">
+                            <div class="card-body" style="padding: 0rem;">
+                                <a href="{$v2.thumb|citrixGetUrl}" target="_blank">
+                                    <img src="{$v2.thumb|citrixGetUrl}" class="col-md-12" style="padding: 0rem;">
+                                </a>
+                            </div>
+                            <div class="card-footer bg-light">
+                                <h5 style="font-size: 0.8rem;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;">{$v2.fragment_name}</h5>
+                                <dl>
+                                    <dd class="btn btn-success btn-sm citrixTd" onclick="publish(this)" data-url="{:url('admin/fragment/publish',['id'=>$v2.id])}">编辑</dd>
+                                    <dt class="btn btn-danger btn-sm infoDelete citrixDd" data-id="{$v2.id}">删除</dt>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                    {/volist}
+                    {/notempty}
+                </div>
+                {/volist}
+                {/notempty}
+            </div>
+        </div>
+    </div>
+</div>
+{include file="public/footer"}
+<script type="text/javascript">
+layui.use(['form'], function()
+{
+    var form     = layui.form;
+    //删除
+    $(document).on("click",".infoDelete",function()
+    {
+        var id = $(this).attr("data-id");
+        layer.confirm('您确定要删除吗？', 
+        {
+          btn: ['确定','取消']
+        }, function(){
+            $.ajax({
+                url:"{:url('admin/fragment/infoDelete')}",
+                data:{"id":id},
+                type:'post',
+                async: false,
+                dataType : 'json',
+                success:function(res) 
+                {
+                    if(res.code == 1)
+                    {
+                        layer.alert(res.msg,{icon:1});
+                        setTimeout(function(){
+                            location.href = location.href;
+                        },1500)
+                    }else
+                    {
+                        layer.alert(res.msg,{icon:2});
+                    }
+                },
+                error:function()
+                {
+                    layer.alert("Systematic anomaly！",{icon:2});
+                }
+            });
+        });
+    });
+});
+/**
+ * [publish 新增/编辑]
+ * @param  {[type]} e [description]
+ * @return {[type]}   [description]
+ */
+function publish(e)
+{
+    layer.open({
+        type: 2,
+        title: '新增/编辑',
+        shadeClose: true,
+        shade: 0.8,
+        area: ['90%', '90%'],
+        content: $(e).attr("data-url"),
+        end:function()
+        { 
+            location.href = location.href;
+        }
+    });
+}
+</script>
+</body>
+</html>

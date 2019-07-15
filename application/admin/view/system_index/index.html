@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+    {include file="public/top"}
+    <style type="text/css">
+        .layui-layer-btn .layui-layer-btn0 {
+            border-color: #1E9FFF;
+            background-color: #1E9FFF;
+            color: #fff!important;
+        }
+    </style>
+</head>
+<body class="sidebar-fixed header-fixed">
+<div class="page-wrapper">
+    <div class="main-container">
+        <div class="col-md-12 col-md-12">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item">
+                    <a href="{:url('admin/systemAdmin/index')}" class="nav-link">
+                        系统配置admin模块
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{:url('admin/systemIndex/index')}" class="nav-link active">
+                        系统配置index模块
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{:url('admin/systemMobile/index')}" class="nav-link">
+                        系统配置mobile模块
+                    </a>
+                </li>
+            </ul>
+           <div class="tab-content">
+                <div class="card-body p-0" style="margin-top: 1rem;">
+                    <form id="form_array">
+                    <div class="col-md-10">
+                        <div class="form-group">
+                            <label for="normal-input" class="form-control-label">网站名称</label>
+                            <input id="normal-input" name="title" autocomplete="off"" class="form-control" placeholder="请输入" {notempty name="$getInfo.title.value"} value="{$getInfo.title.value}" {/notempty}>
+                        </div>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="form-group">
+                            <label for="normal-input" class="form-control-label">网站关键词</label>
+                            <input id="normal-input" name="keywords" autocomplete="off"" class="form-control" placeholder="请输入" {notempty name="$getInfo.keywords.value"} value="{$getInfo.keywords.value}" {/notempty}>
+                        </div>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="form-group">
+                            <label for="normal-input" class="form-control-label">网站描述</label>
+                            <textarea name="description" autocomplete="off" class="form-control" rows="4">{notempty name="$getInfo.description.value"}{$getInfo.description.value}{/notempty}</textarea>
+                        </div>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="toggle-switch" data-ts-color="danger">
+                            <label for="ts1" class="ts-label">开启日志&emsp;&emsp;</label>
+                            <input id="ts1"  name="log_status" type="checkbox" hidden="hidden" {notempty name="$getInfo.log_status.value"} checked="" {/notempty} value="1">
+                            <label for="ts1" class="ts-helper"></label>
+                        </div>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="toggle-switch" data-ts-color="danger">
+                            <label for="ts2" class="ts-label">开启注册&emsp;&emsp;</label>
+                            <input id="ts2"  name="logon_status" type="checkbox" hidden="hidden" {notempty name="$getInfo.logon_status.value"} checked="" {/notempty} value="1">
+                            <label for="ts2" class="ts-helper"></label>
+                        </div>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="toggle-switch" data-ts-color="danger">
+                            <label for="ts3" class="ts-label">开启登录&emsp;&emsp;</label>
+                            <input id="ts3"  name="enroll_status" type="checkbox" hidden="hidden" {notempty name="$getInfo.enroll_status.value"} checked="" {/notempty} value="1">
+                            <label for="ts3" class="ts-helper"></label>
+                        </div>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="toggle-switch" data-ts-color="danger">
+                            <label for="ts4" class="ts-label">开启注册审核</label>
+                            <input id="ts4"  name="verify_status" type="checkbox" hidden="hidden" {notempty name="$getInfo.verify_status.value"} checked="" {/notempty} value="1">
+                            <label for="ts4" class="ts-helper"></label>
+                        </div>
+                    </div>
+                    <div class="col-md-10">
+                        <div style="height: 15px;"></div>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="form-group">
+                            <button type="button" class="btn btn-primary" id="form_submit">
+                                <i class="icon icon-event"></i> 
+                                提交保存
+                            </button>
+                        </div>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{include file="public/footer"}
+<script type="text/javascript">
+layui.use(['form'], function()
+{
+    var form     = layui.form;
+    //删除
+    $(document).on("click","#form_submit",function()
+    {
+        $.ajax({
+            url:"{:url('admin/systemIndex/publish')}",
+            data:$('#form_array').serialize(),
+            type:'post',
+            async: false,
+            dataType : 'json',
+            success:function(res) 
+            {
+                layer.alert(res.msg);
+                if(res.code == 1)
+                {
+                    setTimeout(function(){
+                        location.href = location.href;
+                    },1500)
+                }
+            },
+            error:function()
+            {
+                layer.alert("Systematic anomaly！",{icon:2});
+            }
+        });
+    });
+});
+</script>
+</body>
+</html>
